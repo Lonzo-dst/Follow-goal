@@ -2,71 +2,52 @@
 <html lang="fr">
 <head>
   <meta charset="UTF-8">
-  <title>Compteur Twitch</title>
+  <title>Objectif de Follows</title>
   <style>
     body {
+      margin: 0;
+      padding: 0;
       background: #0f0f0f;
+      font-family: 'Arial', sans-serif;
       color: #fff;
-      font-family: sans-serif;
       display: flex;
       justify-content: center;
       align-items: center;
       height: 100vh;
     }
-    .counter {
-      background: #1e1e1e;
-      border: 2px solid #9146FF;
+
+    .follow-goal {
+      background: linear-gradient(135deg, #1e1e1e, #2c2c2c);
+      border: 2px solid #00c2ff;
+      border-radius: 20px;
       padding: 20px 40px;
-      border-radius: 15px;
-      box-shadow: 0 0 10px #9146FF80;
       text-align: center;
+      box-shadow: 0 0 15px #00c2ff88;
+      max-width: 400px;
     }
-    .counter h1 {
-      color: #9146FF;
+
+    .follow-goal h1 {
+      font-size: 24px;
       margin-bottom: 10px;
+      color: #00c2ff;
     }
-    .count {
-      font-size: 28px;
+
+    .follow-goal p {
+      font-size: 18px;
+      margin: 0;
+    }
+
+    .follow-count {
       font-weight: bold;
+      font-size: 22px;
+      color: #ffffff;
     }
   </style>
 </head>
 <body>
-  <div class="counter">
-    <h1>Followers Twitch</h1>
-    <div class="count" id="followerCount">Chargement...</div>
+  <div class="follow-goal">
+    <h1>Objectif de Follows</h1>
+    <p>Actuels : <span class="follow-count">70</span> / 100</p>
   </div>
-
-  <script>
-    const clientId = 'TON_CLIENT_ID_ICI';
-    const accessToken = 'TON_ACCESS_TOKEN_ICI';
-    const username = 'TON_NOM_TWITCH_ICI'; // sans le @
-
-    async function getUserId() {
-      const res = await fetch(`https://api.twitch.tv/helix/users?login=${username}`, {
-        headers: {
-          'Client-ID': clientId,
-          'Authorization': `Bearer ${accessToken}`
-        }
-      });
-      const data = await res.json();
-      return data.data[0].id;
-    }
-
-    async function getFollowers() {
-      const userId = await getUserId();
-      const res = await fetch(`https://api.twitch.tv/helix/users/follows?to_id=${userId}`, {
-        headers: {
-          'Client-ID': clientId,
-          'Authorization': `Bearer ${accessToken}`
-        }
-      });
-      const data = await res.json();
-      document.getElementById('followerCount').innerText = `${data.total} followers`;
-    }
-
-    getFollowers();
-    setInterval(getFollowers, 60000);
-  </script>
 </body>
 </html>
