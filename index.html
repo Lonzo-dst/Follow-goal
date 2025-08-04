@@ -2,52 +2,98 @@
 <html lang="fr">
 <head>
   <meta charset="UTF-8">
-  <title>Objectif de Follows</title>
+  <title>Compteur de followers Twitch</title>
   <style>
     body {
+      background: transparent;
       margin: 0;
-      padding: 0;
-      background: #0f0f0f;
       font-family: 'Arial', sans-serif;
-      color: #fff;
       display: flex;
       justify-content: center;
       align-items: center;
       height: 100vh;
     }
 
-    .follow-goal {
-      background: linear-gradient(135deg, #1e1e1e, #2c2c2c);
-      border: 2px solid #00c2ff;
-      border-radius: 20px;
+    .counter {
+      background: rgba(30, 30, 30, 0.85);
+      border: 2px solid var(--mainColor, #9146FF);
       padding: 20px 40px;
+      border-radius: 15px;
+      box-shadow: 0 0 10px var(--mainColor, #9146FF);
       text-align: center;
-      box-shadow: 0 0 15px #00c2ff88;
-      max-width: 400px;
+      color: #fff;
     }
 
-    .follow-goal h1 {
-      font-size: 24px;
-      margin-bottom: 10px;
-      color: #00c2ff;
+    .counter h1 {
+      margin: 0 0 10px;
+      font-size: var(--titleSize, 24px);
+      color: var(--mainColor, #9146FF);
+      font-family: var(--titleFont, 'Arial');
     }
 
-    .follow-goal p {
-      font-size: 18px;
-      margin: 0;
-    }
-
-    .follow-count {
+    .count {
+      font-size: var(--countSize, 28px);
       font-weight: bold;
-      font-size: 22px;
-      color: #ffffff;
+      font-family: var(--countFont, 'Arial');
     }
   </style>
 </head>
 <body>
-  <div class="follow-goal">
-    <h1>Objectif de Follows</h1>
-    <p>Actuels : <span class="follow-count">70</span> / 100</p>
+  <div class="counter">
+    <h1 id="customTitle">Followers Twitch</h1>
+    <div class="count" id="followerCount">Chargement...</div>
   </div>
+
+  <script>
+    const fieldData = {
+      clientId: 'id6h4pnpu39t38436wrcje4fncxbw6',
+      accessToken: '5n6ueshmslakhj9ztst8uv0r342nmi',
+      username: 'puv_lonzo',
+      customTitle: 'Followers',
+      mainColor: '#9146FF',
+      titleFont: 'Arial',
+      countFont: 'Arial',
+      titleSize: 24,
+      countSize: 28
+    };
+
+    // Appliquer les styles personnalisés
+    document.documentElement.style.setProperty('--mainColor', fieldData.mainColor);
+    document.documentElement.style.setProperty('--titleFont', fieldData.titleFont);
+    document.documentElement.style.setProperty('--countFont', fieldData.countFont);
+    document.documentElement.style.setProperty('--titleSize', fieldData.titleSize + 'px');
+    document.documentElement.style.setProperty('--countSize', fieldData.countSize + 'px');
+    document.getElementById('customTitle').textContent = fieldData.customTitle;
+
+    async function getUserId() {
+      const res = await fetch(`https://api.twitch.tv/helix/users?login=${fieldData.username}`, {
+        headers: {
+          'Client-ID': fieldData.clientId,
+          'Authorization': `Bearer ${fieldData.accessToken}`
+        }
+      });
+      const data = await res.json();
+      return data.data[0].id;
+    }
+
+    async function getFollowers() {
+      try {
+        const userId = await getUserId();
+        const res = await fetch(`https://api.twitch.tv/helix/users/follows?to_id=${userId}`, {
+          headers: {
+            'Client-ID': fieldData.clientId,
+            'Authorization': `Bearer ${fieldData.accessToken}`
+          }
+        });
+        const data = await res.json();
+        document.getElementById('followerCount').innerText = `${data.total} followers`;
+      } catch (err) {
+        document.getElementById('followerCount').innerText = 'Erreur de chargement';
+      }
+    }
+
+    getFollowers();
+    setInterval(getFollowers, 60000);
+  </script>
 </body>
 </html>
